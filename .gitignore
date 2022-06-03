@@ -7,3 +7,7 @@ dist
 *.egg*
 .DS_Store
 *.zip
+node_modules
+.vscode
+venv*
+
