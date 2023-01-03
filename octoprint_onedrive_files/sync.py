@@ -315,8 +315,10 @@ def onedrive_sync(octoprint_data, onedrive_data):
 
     for op_file_name, op_file_data in octoprint_data.items():
         if op_file_name not in onedrive_data:
-            # File exists in OP, but not OD, delete
-            actions.append({"action": "delete_octoprint", "file": op_file_name})
+            if "eTag" in op_file_data:
+                # File exists in OP, but not OD (and it was in OD at some point), delete
+                actions.append({"action": "delete_octoprint", "file": op_file_name})
+            # Otherwise ignore the file
 
     return actions
 
