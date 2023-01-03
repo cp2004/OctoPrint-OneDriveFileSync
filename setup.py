@@ -1,4 +1,5 @@
 # coding=utf-8
+import versioneer
 
 ########################################################################################################################
 ### Do not forget to adjust the following variables to your own plugin.
@@ -14,7 +15,7 @@ plugin_package = "octoprint_onedrive_files"
 plugin_name = "OctoPrint-OneDriveFilesSync"
 
 # The plugin's version. Can be overwritten within OctoPrint's internal data via __plugin_version__ in the plugin module
-plugin_version = "1.0.0"
+plugin_version = versioneer.get_version()
 
 # The plugin's description. Can be overwritten within OctoPrint's internal data via __plugin_description__ in the plugin
 # module
@@ -27,13 +28,17 @@ plugin_author = "Charlie Powell"
 plugin_author_email = "cp2004.github@gmail.com"
 
 # The plugin's homepage URL. Can be overwritten within OctoPrint's internal data via __plugin_url__ in the plugin module
-plugin_url = "https://github.com/cp2004/OctoPrint-OneDriveFiles"
+plugin_url = "https://github.com/cp2004/OctoPrint-OneDriveFilesSync"
 
 # The plugin's license. Can be overwritten within OctoPrint's internal data via __plugin_license__ in the plugin module
 plugin_license = "AGPLv3"
 
 # Any additional requirements besides OctoPrint should be listed here
-plugin_requires = []
+plugin_requires = [
+    "octo-onedrive"
+    # My personal package that's used to do the onedrive communication, for common code between
+    # the two plugins for Backup & File sync. See https://github.com/cp2004/Octo-OneDrive.
+]
 
 ### --------------------------------------------------------------------------------------------------------------------
 ### More advanced options that you usually shouldn't have to touch follow after this point
@@ -59,9 +64,9 @@ plugin_ignored_packages = []
 # Example:
 #     plugin_requires = ["someDependency==dev"]
 #     additional_setup_parameters = {"dependency_links": ["https://github.com/someUser/someRepo/archive/master.zip#egg=someDependency-dev"]}
-# "python_requires": ">=3,<4" blocks installation on Python 2 systems, to prevent confused users and provide a helpful error. 
+# "python_requires": ">=3,<4" blocks installation on Python 2 systems, to prevent confused users and provide a helpful error.
 # Remove it if you would like to support Python 2 as well as 3 (not recommended).
-additional_setup_parameters = {"python_requires": ">=3,<4"}
+additional_setup_parameters = {"python_requires": ">=3.7,<4"}
 
 ########################################################################################################################
 
@@ -92,6 +97,7 @@ setup_parameters = octoprint_setuptools.create_plugin_setup_parameters(
     additional_packages=plugin_additional_packages,
     ignored_packages=plugin_ignored_packages,
     additional_data=plugin_additional_data,
+    cmdclass=versioneer.get_cmdclass(),
 )
 
 if len(additional_setup_parameters):

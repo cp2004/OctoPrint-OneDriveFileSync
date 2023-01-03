@@ -2,3 +2,5 @@ include README.md
 recursive-include octoprint_onedrive_files/templates *
 recursive-include octoprint_onedrive_files/translations *
 recursive-include octoprint_onedrive_files/static *
+include versioneer.py
+include octoprint_onedrive_files/_version.py
