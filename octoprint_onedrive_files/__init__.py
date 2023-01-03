@@ -23,8 +23,7 @@ class OneDriveFilesSyncPlugin(
     api: api.OneDriveFilesApi
 
     def initialize(self):
-
-
+        self.api = api.OneDriveFilesApi(self)
 
         # Create the 'OneDrive' folder if it doesn't exist
         self._file_manager.add_folder("local", "OneDrive", ignore_existing=True)
