@@ -140,7 +140,6 @@ def run_sync(onedrive, octoprint_filemanager, config, log):
 
         return result
 
-    # TODO test what happens if octoprint_folder is invalid?
     try:
         octoprint_files = recursive_list_octoprint_files(
             octoprint_filemanager.list_files(
@@ -187,6 +186,10 @@ def run_sync(onedrive, octoprint_filemanager, config, log):
                 upload_onedrive(
                     octoprint_filemanager, onedrive, onedrive_folder, action["file"]
                 )
+            elif action["action"] == "delete_octoprint":
+                delete_octoprint(octoprint_filemanager, action["file"])
+            elif action["action"] == "delete_onedrive":
+                delete_onedrive(onedrive, onedrive_folder, action["file"])
         except Exception as e:
             logger.error("Error syncing file with OneDrive")
             logger.error(
@@ -324,7 +327,7 @@ def onedrive_sync(octoprint_data, onedrive_data):
 
 
 def download_onedrive(
-    op_filemanager: octoprint.filemanager.FileManager, onedrive, folder_id, filename
+    op_filemanager: octoprint.filemanager.FileManager, onedrive: octo_onedrive.onedrive.OneDriveComm, folder_id, filename
 ):
     logger.debug("Downloading file from OneDrive: %s", filename)
 
@@ -355,7 +358,6 @@ def download_onedrive(
             allow_overwrite=True,
         )
     except octoprint.filemanager.storage.StorageError as e:
-        # TODO log an error
         logger.error("Error adding file to storage, skipping (%s)", e)
         return
 
@@ -373,7 +375,7 @@ def download_onedrive(
 
 
 def upload_onedrive(
-    op_filemanager: octoprint.filemanager.FileManager, onedrive, folder_id, filename
+    op_filemanager: octoprint.filemanager.FileManager, onedrive: octo_onedrive.onedrive.OneDriveComm, folder_id, filename
 ):
     logger.debug("Uploading file to OneDrive: %s", filename)
 
@@ -388,9 +390,6 @@ def upload_onedrive(
 
     def on_upload_error(error):
         logger.error("Upload error: %s", error)
-
-    # TODO onedrive.upload_file needs subfolder support?
-    # Currently it will just upload to root (I think)
 
     # Upload the file
     result = onedrive.upload_file(
@@ -416,9 +415,30 @@ def upload_onedrive(
     # Hopefully that means all is good?
     logger.debug("File metadata updated successfully")
 
-def delete_octoprint(op_filemanager, _onedrive, filename):
-    pass
+
+def delete_octoprint(
+    op_filemanager: octoprint.filemanager.FileManager, filename
+):
+    logger.debug("Deleting file from OctoPrint: %s", filename)
+
+    try:
+        op_filemanager.remove_file(FileDestinations.LOCAL, f"OneDrive/{filename}")
+    except octoprint.filemanager.storage.StorageError as e:
+        logger.error("Error deleting file from storage, skipping (%s)", e)
 
 
-def delete_onedrive(_op_filemanager, onedrive, filename):
-    pass
+def delete_onedrive(
+    onedrive: octo_onedrive.onedrive.OneDriveComm, folder_id,
+    filename
+):
+    logger.debug("Deleting file from OneDrive: %s", filename)
+
+    try:
+        result = onedrive.delete_file(folder_id, filename)
+    except Exception as e:
+        logger.error("Error deleting file from OneDrive, skipping (%s)", e)
+        return
+
+    if type(result) == dict and "error" in result:
+        logger.error("Error deleting file from OneDrive, skipping (%s)", result["error"])
+        return
