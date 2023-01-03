@@ -38,8 +38,9 @@ class OneDriveSyncWorker(threading.Thread):
         # {
         #    "mode": "onedrive",
         #    "interval": 60,
-        #    "onedrive_folder": "D4CE5C88FADEF65F!331630",
-        #    "octoprint_folder": "OneDrive"
+        #    "onedrive_folder": "...",
+        #    "octoprint_folder": "OneDrive",
+        #    "max_depth": 4,
         # }
 
         if callable(config):
@@ -49,7 +50,8 @@ class OneDriveSyncWorker(threading.Thread):
 
         self.sync_condition = sync_condition
 
-        self.finished = threading.Event()
+        self.interrupt = threading.Event()
+        self.finished = False
 
         self.daemon = True
 
@@ -58,7 +60,8 @@ class OneDriveSyncWorker(threading.Thread):
         self.on_log(level, msg)
 
     def stop(self):
-        self.finished.set()
+        self.finished = True
+        self.interrupt.set()
 
     def run(self):
         while True:
@@ -66,15 +69,20 @@ class OneDriveSyncWorker(threading.Thread):
             config = self.config()
 
             # Wait, but break if we're told to stop
-            self.finished.wait(config["interval"])
-            if self.finished.is_set():
+            self.interrupt.wait(config["interval"])
+
+            if self.finished:
                 break
 
-            # Only run if the sync condition is met
             if self.sync_condition():
                 run_sync(
                     self.onedrive, self.octoprint_filemanager, config, self.dual_log
                 )
+                self.interrupt.clear()
+
+    def sync_now(self):
+        # Override the interval and sync now
+        self.interrupt.set()
 
 
 def run_sync(onedrive, octoprint_filemanager, config, log):
@@ -198,7 +206,7 @@ def run_sync(onedrive, octoprint_filemanager, config, log):
             logger.exception(e)
 
     end_time = time.monotonic()
-    logger.debug("Sync run finished in %s seconds", round(end_time - start_time, 2))
+    logger.debug("Sync run finished in %s seconds, next run in maximum of %s seconds", round(end_time - start_time, 2), int(config["interval"]))
 
 
 def two_way_sync(octoprint_data, onedrive_data):

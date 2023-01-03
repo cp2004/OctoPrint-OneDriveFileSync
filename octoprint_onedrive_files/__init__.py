@@ -16,8 +16,45 @@ class OneDriveFilesSyncPlugin(
     octoprint.plugin.AssetPlugin,
     octoprint.plugin.TemplatePlugin,
     octoprint.plugin.StartupPlugin,
+    octoprint.plugin.SimpleApiPlugin,
 ):
-    worker = None
+    sync_worker: sync.OneDriveSyncWorker
+    onedrive: octo_onedrive.onedrive.OneDriveComm
+
+    def initialize(self):
+        # Create the 'OneDrive' folder if it doesn't exist
+        self._file_manager.add_folder("local", "OneDrive", ignore_existing=True)
+
+        def get_config():
+            return {
+                "mode": self._settings.get(["sync", "mode"]),
+                "interval": self._settings.get(["sync", "interval"]),
+                "onedrive_folder": self._settings.get(["folder", "id"]),
+                "octoprint_folder": "OneDrive",
+                "max_depth": self._settings.get(["sync", "max_depth"]),
+            }
+
+        def sync_condition():
+            # TODO configurable
+            return not self._printer.is_printing()
+
+        self.onedrive = octo_onedrive.onedrive.OneDriveComm(
+            APPLICATION_ID,
+            ["Files.ReadWrite"],
+            str(Path(self._settings.get_plugin_data_folder()) / "token_cache.bin"),
+            "https://login.microsoftonline.com/consumers",
+            # encryption_key=self._settings.global_get(["server", "secretKey"]),
+        )
+
+        # Test starting the sync worker
+        self.sync_worker = sync.OneDriveSyncWorker(
+            config=get_config,
+            onedrive=self.onedrive,
+            octoprint_filemanager=self._file_manager,
+            sync_condition=sync_condition,
+            on_log=lambda log, msg: None,
+        )
+        self.sync_worker.start()
 
     # SettingsPlugin mixin
     def get_settings_defaults(self):
@@ -37,39 +74,17 @@ class OneDriveFilesSyncPlugin(
             },
         }
 
-    def on_after_startup(self):
-        # Create the 'OneDrive' folder if it doesn't exist
-        self._file_manager.add_folder("local", "OneDrive", ignore_existing=True)
+    def get_api_commands(self):
+        return {
+            "sync": [],
+        }
 
-        onedrive = octo_onedrive.onedrive.OneDriveComm(
-            APPLICATION_ID,
-            ["Files.ReadWrite"],
-            str(Path(self._settings.get_plugin_data_folder()) / "token_cache.bin"),
-            "https://login.microsoftonline.com/consumers",
-            # encryption_key=self._settings.global_get(["server", "secretKey"]),
-        )
-
-        def get_config():
-            return {
-                "mode": self._settings.get(["sync", "mode"]),
-                "interval": self._settings.get(["sync", "interval"]),
-                "onedrive_folder": self._settings.get(["folder", "id"]),
-                "octoprint_folder": "OneDrive",
-                "max_depth": self._settings.get(["sync", "max_depth"]),
-            }
-
-        # Test starting the sync worker
-        self.worker = sync.OneDriveSyncWorker(
-            config=get_config,
-            onedrive=onedrive,
-            octoprint_filemanager=self._file_manager,
-            sync_condition=lambda: True,
-            on_log=lambda log, msg: None,
-        )
-        self.worker.start()
+    def on_api_command(self, command, data):
+        if command == "sync":
+            self.sync_worker.sync_now()
 
     def on_shutdown(self):
-        self.worker.stop()
+        self.sync_worker.stop()
 
     # AssetPlugin mixin
     def get_assets(self):
