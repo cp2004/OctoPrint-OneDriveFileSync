@@ -6,7 +6,7 @@ from pathlib import Path
 import octo_onedrive.onedrive
 import octoprint.plugin
 
-from . import _version, sync
+from . import _version, sync, api
 
 APPLICATION_ID = "192e2408-1e4e-49bb-96af-fef02c7c2433"  # Not a secret :)
 
@@ -20,8 +20,12 @@ class OneDriveFilesSyncPlugin(
 ):
     sync_worker: sync.OneDriveSyncWorker
     onedrive: octo_onedrive.onedrive.OneDriveComm
+    api: api.OneDriveFilesApi
 
     def initialize(self):
+
+
+
         # Create the 'OneDrive' folder if it doesn't exist
         self._file_manager.add_folder("local", "OneDrive", ignore_existing=True)
 
@@ -75,13 +79,16 @@ class OneDriveFilesSyncPlugin(
         }
 
     def get_api_commands(self):
-        return {
-            "sync": [],
-        }
+        return api.Commands.list_commands()
 
     def on_api_command(self, command, data):
-        if command == "sync":
-            self.sync_worker.sync_now()
+        return self.api.on_api_command(command, data)
+
+    def on_api_get(self, request):
+        return self.api.on_api_get(request)
+
+    def sync_now(self):
+        self.sync_worker.sync_now()
 
     def on_shutdown(self):
         self.sync_worker.stop()
