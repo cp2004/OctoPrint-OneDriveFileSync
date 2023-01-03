@@ -1,2 +1,3 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+octoprint_onedrive_files/_version.py export-subst
