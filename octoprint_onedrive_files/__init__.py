@@ -92,13 +92,14 @@ class OneDriveFilesSyncPlugin(
     def on_shutdown(self):
         self.sync_worker.stop()
 
+    def send_message(self, msg_type: str, msg_content: dict):
+        self._plugin_manager.send_plugin_message(
+            "onedrive_files", {"type": msg_type, "content": msg_content}
+        )
+
     # AssetPlugin mixin
     def get_assets(self):
-        return {
-            "js": ["js/onedrive_files.js"],
-            "css": ["css/onedrive_files.css"],
-            "less": ["less/onedrive_files.less"],
-        }
+        return {"js": ["dist/onedrive_backup.js", "viewmodels/settings.js", "viewmodels/navbar.js"]}
 
     # Softwareupdate hook
     def get_update_information(self):
@@ -115,7 +116,7 @@ class OneDriveFilesSyncPlugin(
         }
 
 
-__plugin_name__ = "Onedrive Files Sync"
+__plugin_name__ = "OneDrive Files Sync"
 __plugin_pythoncompat__ = ">=3,<4"
 __plugin_version__ = _version.get_versions()["version"]
 
