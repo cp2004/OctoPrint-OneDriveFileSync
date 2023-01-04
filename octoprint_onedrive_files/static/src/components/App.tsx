@@ -2,11 +2,9 @@ import * as React from "react"
 
 import ErrorBoundary from "./ErrorBoundary"
 import FileBrowser from "./FileBrowser"
-import Footer from "./Footer"
 import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools"
 import Auth from "./Auth";
-import SecurityWarning from "./Security";
 
 
 const queryClient = new QueryClient({
@@ -49,14 +47,8 @@ function App () {
     return (
         <>
             <Auth />
-
             <hr />
-
             <FileBrowser />
-
-            <SecurityWarning />
-
-            <Footer />
         </>
     )
 }

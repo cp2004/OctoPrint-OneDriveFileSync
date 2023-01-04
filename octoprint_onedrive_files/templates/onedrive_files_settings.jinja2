@@ -1,8 +1,85 @@
 <h5>OneDrive Backup Configuration</h5>
 
-<div id="onedrive_files_viewmodel">
-
-</div>
-
 {# React root for auth/sync destination #}
 <div id="onedrive_files_root"></div>
+
+<div id="onedrive_files_viewmodel">
+    <hr>
+    <h5>Sync Settings</h5>
+    <form class="form-horizontal" onsubmit="return false;">
+        <div class="control-group">
+            <label for="onedrive_files_mode" class="control-label">Sync Mode</label>
+            <div class="controls">
+                <select id="onedrive_files_mode" data-bind="value: settingsViewModel.settings.plugins.onedrive_files.sync.mode">
+                    <option value="onedrive">OneDrive</option>
+                    <option value="octoprint">OctoPrint</option>
+                    <option value="two">Two-way</option>
+                </select>
+                <span class="help-inline" data-bind="text: syncModeHelp"></span>
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="onedrive_files_printsync">Disable sync while printing</label>
+            <div class="controls">
+                <input type="checkbox" id="onedrive_files_printsync" data-bind="checked: !settingsViewModel.settings.plugins.onedrive_files.sync.while_printing()" >
+                <p class="help-inline">
+                    Syncing files can cause high resource usage, so to avoid disruption to printing, syncing can be disabled.
+                </p>
+            </div>
+        </div>
+        <div class="control-group">
+            <label for="onedrive_files_" class="control-label">Max Subfolder Depth</label>
+            <div class="controls">
+                <input type="number" id="onedrive_files_syncdepth" data-bind="value: settingsViewModel.settings.plugins.onedrive_files.sync.max_depth" >
+                <p class="help-inline">
+                    Each sub-folder in OneDrive triggers its own network request. To avoid performance issues, the maximum depth of subfolders to sync can be limited.
+                </p>
+            </div>
+        </div>
+        <div class="control-group">
+            <label for="onedrive_files_automatic" class="control-label">Automatic Sync</label>
+            <div class="controls">
+                <input type="checkbox" id="onedrive_files_automatic" data-bind="checked: settingsViewModel.settings.plugins.onedrive_files.sync.automatic" >
+            </div>
+        </div>
+        <div class="control-group">
+            <label for="onedrive_files_interval" class="control-label">Automatic Sync Interval</label>
+            <div class="controls">
+                <div class="input-append">
+                    <input type="number" id="onedrive_files_interval" data-bind="value: settingsViewModel.settings.plugins.onedrive_files.sync.interval" >
+                    <span class="add-on">
+                        secs
+                    </span>
+                </div>
+                 <p class="help-inline">
+                    How often to sync files automatically. Defaults to 1 hour (3600 seconds).
+                </p>
+            </div>
+        </div>
+    </form>
+</div>
+
+<hr />
+
+<h5>Important Security Notice</h5>
+<p>
+    Please be aware that this plugin stores its tokens for accessing your Microsoft account in OctoPrint's
+    configuration folder. As a result, if your OctoPrint install (or the server it is running on) is
+    compromised, your files in OneDrive are at risk.
+</p>
+<p>
+    <strong>
+        It is not recommended to use this plugin on OctoPrint installs accessible directly from the
+        internet, or multi-user installs where you may not trust every user.
+    </strong>
+</p>
+<p>
+    The author of this plugin is not responsible for any damage caused as a result of using this plugin.
+</p>
+
+<hr />
+<p>
+    OneDrive File Sync by <a href="https://github.com/cp2004" target="_blank" rel="noreferrer">Charlie Powell</a>
+    | <i class="fas fa-tag text-success"></i>
+    <a href="https://github.com/cp2004/OctoPrint-OneDriveFilesSync/releases" target="_blank" rel="noreferrer"> Release notes</a>
+</p>

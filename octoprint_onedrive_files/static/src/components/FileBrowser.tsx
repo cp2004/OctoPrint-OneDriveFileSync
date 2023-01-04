@@ -80,6 +80,7 @@ export default function FileBrowser () {
 
     return (
         <>
+            <h5>Sync Folder</h5>
             {
                 configDataFetching
                     ? <span><i className={"fas fa-spin fa-spinner"} /> Loading...</span>

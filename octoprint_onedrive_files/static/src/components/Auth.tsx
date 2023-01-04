@@ -95,6 +95,7 @@ export default function Auth () {
 
     return (
         <>
+            <h5>Account Settings</h5>
             {hasAccount
                 ? <>
                     <p>Account registered:</p>

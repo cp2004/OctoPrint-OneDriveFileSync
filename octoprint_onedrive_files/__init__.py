@@ -38,8 +38,13 @@ class OneDriveFilesSyncPlugin(
             }
 
         def sync_condition():
-            # TODO configurable
-            return not self._printer.is_printing()
+            if self._settings.get(["sync", "automatic"]):
+                if self._settings.get(["sync", "while_printing"]):
+                    return True
+                else:
+                    return not self._printer.is_printing()
+            else:
+                return False
 
         self.onedrive = octo_onedrive.onedrive.OneDriveComm(
             APPLICATION_ID,
@@ -73,7 +78,9 @@ class OneDriveFilesSyncPlugin(
             "sync": {
                 "mode": "onedrive",
                 "interval": 60 * 60,
-                "max_depth": 4,
+                "max_depth": 6,
+                "automatic": True,
+                "while_printing": False,
             },
         }
 
