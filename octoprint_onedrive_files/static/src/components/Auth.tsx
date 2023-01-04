@@ -1,6 +1,7 @@
 import * as React from "react"
 import {useQuery} from "@tanstack/react-query";
 import useSocket from "../hooks/useSocket";
+import CopyButton from "./CopyButton";
 
 // @ts-ignore:next-line
 const OctoPrint = window.OctoPrint
@@ -73,21 +74,6 @@ export default function Auth () {
         })
     }
 
-    const copy = async text => {
-        if (!navigator?.clipboard) {
-            console.warn('Clipboard not supported')
-            return false
-        }
-
-        // Try to save to clipboard then save it in the state if worked
-        try {
-            await navigator.clipboard.writeText(text)
-            return true
-        } catch (error) {
-            console.warn('Copy failed', error)
-            return false
-        }
-    }
 
     const loading = isLoading || authLoading
 
@@ -128,10 +114,7 @@ export default function Auth () {
                     {" "}<code>{data.flow.user_code}</code> to connect your Microsoft account
                 </p>
                 <p>
-                    <button className={"btn btn-mini"} onClick={() => { copy(data.flow.user_code) }} >
-                        <i className={"fas fa-fw fa-copy"} />
-                        {" "}Copy code
-                    </button>
+                    <CopyButton text={"Copy code"} content={data.flow.user_code} />
                     {" "}<i className="fas fa-clock" />{" Code expires at " + new Date(data.flow.expires_at * 1000).toLocaleTimeString()}
                 </p>
             </div>
@@ -141,14 +124,14 @@ export default function Auth () {
                 <p>
                     <strong>Success! </strong>
                     Your account has been successfully added to the plugin.
-                    Make sure to configure your synced folder below.
+                    Make sure to configure your sync folder below.
                 </p>
             </div>}
             {authStatus === "failed" && <div className={"alert alert-error"} style={{marginTop: "5px"}}>
                 <p>
                     <strong>Error! </strong>
                     There was an error adding your account.
-                    Please try again.
+                    Please try again, or check the logs for details if this error persists.
                 </p>
             </div>}
         </>
