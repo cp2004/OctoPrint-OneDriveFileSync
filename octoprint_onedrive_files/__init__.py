@@ -131,6 +131,18 @@ class OneDriveFilesSyncPlugin(
                 "type": "github_release",
                 "user": "cp2004",
                 "repo": "OctoPrint-OneDriveFileSync",
+                "stable_branch": {
+                    "name": "Stable",
+                    "branch": "main",
+                    "comittish": ["main"],
+                },
+                "prerelease_branches": [
+                    {
+                        "name": "Release Candidate",
+                        "branch": "pre-release",
+                        "comittish": ["pre-release", "main"],
+                    }
+                ],
                 "current": self._plugin_version,
                 "pip": "https://github.com/cp2004/OctoPrint-OneDriveFileSync/releases/download/{target_version}/release.zip",
             }
