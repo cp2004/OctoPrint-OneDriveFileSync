@@ -1,17 +1,24 @@
 $(function () {
     function OneDriveFilesSettingsVM(parameters) {
-        const self = this;
+        const self = this
 
-        self.settingsViewModel = parameters[0];
+        self.settingsViewModel = parameters[0]
 
         self.syncModeHelp = ko.pureComputed(function () {
-            const syncMode = self.settingsViewModel.settings.plugins.onedrive_files.sync.mode();
+            const syncMode =
+                self.settingsViewModel.settings.plugins.onedrive_files.sync.mode()
             if (syncMode === "onedrive") {
-                return gettext("OneDrive → OctoPrint sync. The OctoPrint folder will be synced to always be the same as the OneDrive folder")
+                return gettext(
+                    "OneDrive → OctoPrint sync. The OctoPrint folder will be synced to always be the same as the OneDrive folder",
+                )
             } else if (syncMode === "octoprint") {
-                return gettext("OctoPrint → OneDrive sync. The OneDrive folder will be synced to always be the same as the OctoPrint folder")
+                return gettext(
+                    "OctoPrint → OneDrive sync. The OneDrive folder will be synced to always be the same as the OctoPrint folder",
+                )
             } else if (syncMode === "two") {
-                return gettext("(Experimental) OneDrive ↔ OctoPrint sync. OneDrive is preferred as the main source of files, but those added to OctoPrint will also be uploaded. Subject to change.")
+                return gettext(
+                    "(Experimental) OneDrive ↔ OctoPrint sync. OneDrive is preferred as the main source of files, but those added to OctoPrint will also be uploaded. Subject to change.",
+                )
             }
         })
     }
@@ -20,6 +27,6 @@ $(function () {
         construct: OneDriveFilesSettingsVM,
         name: "OneDriveFilesSettingsViewModel",
         dependencies: ["settingsViewModel"],
-        elements: ["#onedrive_files_viewmodel"]
+        elements: ["#onedrive_files_viewmodel"],
     })
 })

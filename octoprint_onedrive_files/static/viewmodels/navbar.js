@@ -1,16 +1,19 @@
 $(function () {
     function OneDriveFilesNavbarVM(parameters) {
-        const self = this;
+        const self = this
 
-        self.settingsViewModel = parameters[0];
-        self.printerStateViewModel = parameters[1];
+        self.settingsViewModel = parameters[0]
+        self.printerStateViewModel = parameters[1]
 
-        self.syncing = ko.observable(false);
+        self.syncing = ko.observable(false)
 
         self.syncStatusClass = ko.pureComputed(function () {
-            if (!self.settingsViewModel.settings.plugins.onedrive_files.sync.while_printing() && self.printerStateViewModel.isPrinting()) {
+            if (
+                !self.settingsViewModel.settings.plugins.onedrive_files.sync.while_printing() &&
+                self.printerStateViewModel.isPrinting()
+            ) {
                 return "fas fa-pause"
-            } else if (self.syncing()){
+            } else if (self.syncing()) {
                 return "fas fa-sync"
             } else {
                 return "fas fa-check"
@@ -18,17 +21,18 @@ $(function () {
         })
 
         self.syncPopoverContent = ko.pureComputed(function () {
-            let msg = "Sync status: ";
-            const paused = !self.settingsViewModel.settings.plugins.onedrive_files.sync.while_printing() && self.printerStateViewModel.isPrinting()
+            let msg = "Sync status: "
+            const paused =
+                !self.settingsViewModel.settings.plugins.onedrive_files.sync.while_printing() &&
+                self.printerStateViewModel.isPrinting()
 
             if (paused) {
                 msg += "Paused"
-            } else if (self.syncing()){
+            } else if (self.syncing()) {
                 msg += "Syncing..."
             } else {
                 msg += "Synced"
             }
-
 
             msg = "<p>" + msg + "</p><p>Last Sync: " + self.lastSync() + "</p>"
             if (!paused) {
@@ -41,7 +45,7 @@ $(function () {
             OctoPrint.simpleApiCommand("onedrive_files", "sync")
         }
 
-        self.lastSync = ko.observable("Never");
+        self.lastSync = ko.observable("Never")
 
         self.onDataUpdaterPluginMessage = function (plugin, data) {
             if (plugin !== "onedrive_files") {
@@ -61,6 +65,6 @@ $(function () {
         construct: OneDriveFilesNavbarVM,
         name: "OneDriveFilesNavbarViewModel",
         dependencies: ["settingsViewModel", "printerStateViewModel"],
-        elements: ["#navbar_plugin_onedrive_files"]
+        elements: ["#navbar_plugin_onedrive_files"],
     })
 })

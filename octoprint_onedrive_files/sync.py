@@ -3,16 +3,16 @@ Module to sync files to OneDrive
 
 
 """
+import copy
 import logging
 import os
-import threading
-import copy
 import pathlib
+import threading
 import time
 
-import octoprint.filemanager.storage
-from octoprint.filemanager import valid_file_type, DiskFileWrapper, FileDestinations
 import octo_onedrive.onedrive
+import octoprint.filemanager.storage
+from octoprint.filemanager import DiskFileWrapper, FileDestinations, valid_file_type
 
 logger = logging.getLogger("octoprint.plugins.onedrive_files.sync")
 
@@ -141,7 +141,7 @@ def run_sync(onedrive, octoprint_filemanager, config):
     def recursive_list_octoprint_files(data, current_depth=0, current_path="/"):
         result = {}
 
-        for name, item in data.items():
+        for item in data.values():
             if item["type"] == "machinecode":
                 if "onedrive" in item:
                     # OneDrive metadata set
@@ -174,7 +174,7 @@ def run_sync(onedrive, octoprint_filemanager, config):
     except Exception as e:
         logger.error("Error while listing files")
         logger.exception(e)
-        raise FatalSyncError("Error while listing files")
+        raise FatalSyncError("Error while listing files") from e
 
     sync_algorithms = {
         "two": two_way_sync,
@@ -216,7 +216,11 @@ def run_sync(onedrive, octoprint_filemanager, config):
             logger.exception(e)
 
     end_time = time.monotonic()
-    logger.debug("Sync run finished in %s seconds, next run in maximum of %s seconds", round(end_time - start_time, 2), int(config["interval"]))
+    logger.debug(
+        "Sync run finished in %s seconds, next run in maximum of %s seconds",
+        round(end_time - start_time, 2),
+        int(config["interval"]),
+    )
 
 
 def two_way_sync(octoprint_data, onedrive_data):
@@ -296,7 +300,7 @@ def octoprint_sync(octoprint_data, onedrive_data):
             # File exists in OD, but not OP, delete
             actions.append({"action": "delete_onedrive", "file": od_file_name})
 
-    for op_file_name, op_file_data in octoprint_data.items():
+    for op_file_name in octoprint_data.keys():
         if op_file_name not in onedrive_data:
             # File exists in OP, but not OD, upload
             actions.append({"action": "upload", "file": op_file_name})
@@ -346,7 +350,10 @@ def onedrive_sync(octoprint_data, onedrive_data):
 
 
 def download_onedrive(
-    op_filemanager: octoprint.filemanager.FileManager, onedrive: octo_onedrive.onedrive.OneDriveComm, folder_id, filename
+    op_filemanager: octoprint.filemanager.FileManager,
+    onedrive: octo_onedrive.onedrive.OneDriveComm,
+    folder_id,
+    filename,
 ):
     logger.debug("Downloading file from OneDrive: %s", filename)
 
@@ -370,7 +377,7 @@ def download_onedrive(
 
     # TODO check that we are not overwriting something already printing?
     try:
-        added_file = op_filemanager.add_file(
+        op_filemanager.add_file(
             FileDestinations.LOCAL,
             future_full_path_in_storage,
             file,
@@ -394,12 +401,17 @@ def download_onedrive(
 
 
 def upload_onedrive(
-    op_filemanager: octoprint.filemanager.FileManager, onedrive: octo_onedrive.onedrive.OneDriveComm, folder_id, filename
+    op_filemanager: octoprint.filemanager.FileManager,
+    onedrive: octo_onedrive.onedrive.OneDriveComm,
+    folder_id,
+    filename,
 ):
     logger.debug("Uploading file to OneDrive: %s", filename)
 
     # Get the file from OctoPrint
-    file_path = op_filemanager.path_on_disk(FileDestinations.LOCAL, f"OneDrive/{filename}")
+    file_path = op_filemanager.path_on_disk(
+        FileDestinations.LOCAL, f"OneDrive/{filename}"
+    )
 
     def on_upload_progress(progress):
         logger.debug("Upload progress: %s", progress)
@@ -435,9 +447,7 @@ def upload_onedrive(
     logger.debug("File metadata updated successfully")
 
 
-def delete_octoprint(
-    op_filemanager: octoprint.filemanager.FileManager, filename
-):
+def delete_octoprint(op_filemanager: octoprint.filemanager.FileManager, filename):
     logger.debug("Deleting file from OctoPrint: %s", filename)
 
     try:
@@ -446,10 +456,7 @@ def delete_octoprint(
         logger.error("Error deleting file from storage, skipping (%s)", e)
 
 
-def delete_onedrive(
-    onedrive: octo_onedrive.onedrive.OneDriveComm, folder_id,
-    filename
-):
+def delete_onedrive(onedrive: octo_onedrive.onedrive.OneDriveComm, folder_id, filename):
     logger.debug("Deleting file from OneDrive: %s", filename)
 
     try:
@@ -459,10 +466,13 @@ def delete_onedrive(
         return
 
     if type(result) == dict and "error" in result:
-        logger.error("Error deleting file from OneDrive, skipping (%s)", result["error"])
+        logger.error(
+            "Error deleting file from OneDrive, skipping (%s)", result["error"]
+        )
         return
 
 
 class FatalSyncError(Exception):
     """Exception raised for fatal errors in the sync process."""
+
     pass

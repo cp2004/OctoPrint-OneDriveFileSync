@@ -1,8 +1,8 @@
 # coding=utf-8
 import versioneer
 
-########################################################################################################################
-### Do not forget to adjust the following variables to your own plugin.
+######################################################################################################################
+# Do not forget to adjust the following variables to your own plugin.
 
 # The plugin's identifier, has to be unique
 plugin_identifier = "onedrive_files"
@@ -40,9 +40,9 @@ plugin_requires = [
     # the two plugins for Backup & File sync. See https://github.com/cp2004/Octo-OneDrive.
 ]
 
-### --------------------------------------------------------------------------------------------------------------------
-### More advanced options that you usually shouldn't have to touch follow after this point
-### --------------------------------------------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------------------------------------
+# More advanced options that you usually shouldn't have to touch follow after this point
+# --------------------------------------------------------------------------------------------------------------------
 
 # Additional package data to install for this plugin. The subfolders "templates", "static" and "translations" will
 # already be installed automatically if they exist. Note that if you add something here you'll also need to update
@@ -74,7 +74,7 @@ from setuptools import setup
 
 try:
     import octoprint_setuptools
-except:
+except ImportError:
     print(
         "Could not import OctoPrint's setuptools, are you sure you are running that under "
         "the same python installation that OctoPrint is installed under?"

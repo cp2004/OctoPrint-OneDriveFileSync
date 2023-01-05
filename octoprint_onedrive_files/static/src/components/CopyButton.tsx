@@ -1,14 +1,13 @@
 import * as React from "react"
 
-
-export default function CopyButton ({text, content}) {
+export default function CopyButton({ text, content }) {
     const [copied, setCopied] = React.useState(false)
     const [copyError, setCopyError] = React.useState(false)
 
-    const copy = async text => {
+    const copy = async (text) => {
         setCopyError(false)
         if (!navigator?.clipboard) {
-            console.warn('Clipboard not supported')
+            console.warn("Clipboard not supported")
             return false
         }
 
@@ -17,13 +16,13 @@ export default function CopyButton ({text, content}) {
             await navigator.clipboard.writeText(text)
             return true
         } catch (error) {
-            console.warn('Copy failed', error)
+            console.warn("Copy failed", error)
             return false
         }
     }
 
     const doCopy = () => {
-        copy(content).then(result => {
+        copy(content).then((result) => {
             if (result) {
                 setCopied(true)
                 setTimeout(() => setCopied(false), 5000)
@@ -36,9 +35,9 @@ export default function CopyButton ({text, content}) {
     const icon = copied ? "fa-check" : "fa-copy"
 
     return (
-        <button className={"btn btn-mini"} onClick={doCopy} >
-           <i className={"fas fa-fw " + (copyError ? "fa-times" : icon)} />
-           {" "}{text}
-       </button>
+        <button className={"btn btn-mini"} onClick={doCopy}>
+            <i className={"fas fa-fw " + (copyError ? "fa-times" : icon)} />{" "}
+            {text}
+        </button>
     )
 }

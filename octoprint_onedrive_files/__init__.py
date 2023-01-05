@@ -1,13 +1,10 @@
-# coding=utf-8
-from __future__ import absolute_import
-
 from pathlib import Path
 
 import octo_onedrive.onedrive
 import octoprint.plugin
 from octoprint.util.version import is_octoprint_compatible
 
-from . import _version, sync, api
+from . import _version, api, sync
 
 APPLICATION_ID = "192e2408-1e4e-49bb-96af-fef02c7c2433"  # Not a secret :)
 
@@ -114,7 +111,13 @@ class OneDriveFilesSyncPlugin(
 
     # AssetPlugin mixin
     def get_assets(self):
-        assets = {"js": ["dist/onedrive_backup.js", "viewmodels/settings.js", "viewmodels/navbar.js"]}
+        assets = {
+            "js": [
+                "dist/onedrive_backup.js",
+                "viewmodels/settings.js",
+                "viewmodels/navbar.js",
+            ]
+        }
 
         if is_octoprint_compatible("<=1.9.0"):
             # Add icon transform CSS

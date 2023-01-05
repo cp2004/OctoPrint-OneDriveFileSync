@@ -40,6 +40,7 @@ class OneDriveFilesApi:
             self.plugin.sync_now()
 
         if command == Commands.StartAuth:
+
             def on_success(response):
                 self.plugin.send_message("auth_done", {})
 

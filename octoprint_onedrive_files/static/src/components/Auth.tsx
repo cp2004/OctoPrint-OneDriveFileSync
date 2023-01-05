@@ -1,46 +1,47 @@
 import * as React from "react"
-import {useQuery} from "@tanstack/react-query";
-import useSocket from "../hooks/useSocket";
-import CopyButton from "./CopyButton";
+import { useQuery } from "@tanstack/react-query"
+import useSocket from "../hooks/useSocket"
+import CopyButton from "./CopyButton"
 
 // @ts-ignore:next-line
 const OctoPrint = window.OctoPrint
 const PLUGIN_ID = "onedrive_files"
 
 interface AuthData {
-    url: string,
+    url: string
     code: string
 }
 
 interface PluginSocketMessage {
     data: {
-        plugin: string;
+        plugin: string
         data: {
-            type: string;
-            content: object;
+            type: string
+            content: object
         }
-    };
+    }
 }
 
 interface AuthProps {
-    accounts: string[];
+    accounts: string[]
 }
 
-export default function Auth () {
-    const [authStatus, setAuthStatus] = React.useState<"success" | "failed" | null>(null)
+export default function Auth() {
+    const [authStatus, setAuthStatus] = React.useState<
+        "success" | "failed" | null
+    >(null)
     const [authLoading, setAuthLoading] = React.useState<boolean>(false)
 
-    const {data, isLoading, error, refetch} = useQuery(
-        ["accounts"],
-        () => OctoPrint.simpleApiGet(PLUGIN_ID)
+    const { data, isLoading, error, refetch } = useQuery(["accounts"], () =>
+        OctoPrint.simpleApiGet(PLUGIN_ID),
     )
 
     const hasAccount = Boolean(data?.accounts.length)
     const addingAccount = data?.flow
 
-    const accountsList = hasAccount ? data.accounts.map(account => (
-        <li key={account}>{account}</li>
-    )) : []
+    const accountsList = hasAccount
+        ? data.accounts.map((account) => <li key={account}>{account}</li>)
+        : []
 
     useSocket("plugin", (message) => {
         const plugin = message.data.plugin
@@ -74,7 +75,6 @@ export default function Auth () {
         })
     }
 
-
     const loading = isLoading || authLoading
 
     const codeExpired = data?.flow?.expires_at * 1000 < Date.now()
@@ -82,58 +82,99 @@ export default function Auth () {
     return (
         <>
             <h5>Account Settings</h5>
-            {hasAccount
-                ? <>
+            {hasAccount ? (
+                <>
                     <p>Account registered:</p>
                     <ul>{accountsList}</ul>
-                  </>
-                : <p>
-                    No Microsoft accounts registered, add one below
-                  </p>
-            }
+                </>
+            ) : (
+                <p>No Microsoft accounts registered, add one below</p>
+            )}
 
             <div>
                 <button className={"btn btn-success"} onClick={addAccount}>
                     <i
                         className={
                             "fas fa-fw " +
-                            (loading ? "fa-spin fa-spinner" : (hasAccount ? "fa-user-edit" : (codeExpired ? "fa-redo" : "fa-user-plus")))} />
-                    {" "}{hasAccount ? "Change Account" : (codeExpired ? "Regenerate code" : "Add account")}
+                            (loading
+                                ? "fa-spin fa-spinner"
+                                : hasAccount
+                                ? "fa-user-edit"
+                                : codeExpired
+                                ? "fa-redo"
+                                : "fa-user-plus")
+                        }
+                    />{" "}
+                    {hasAccount
+                        ? "Change Account"
+                        : codeExpired
+                        ? "Regenerate code"
+                        : "Add account"}
                 </button>
-                {hasAccount &&
-                <button className={"btn btn-danger"} style={{marginLeft: "5px"}} onClick={forgetAccount}>
-                    <i className={"fas fa-fw fa-trash"} />
-                    {" "}Forget Account
-                </button>
-                }
+                {hasAccount && (
+                    <button
+                        className={"btn btn-danger"}
+                        style={{ marginLeft: "5px" }}
+                        onClick={forgetAccount}
+                    >
+                        <i className={"fas fa-fw fa-trash"} /> Forget Account
+                    </button>
+                )}
             </div>
 
-            {addingAccount && <div className={"row-fluid"}>
-                <p style={{marginTop: "10px"}}>
-                    Head to <a href={data.flow.verification_uri} target={"_blank"} rel={"noreferrer"}>{data.flow.verification_uri}</a> and enter code
-                    {" "}<code>{data.flow.user_code}</code> to connect your Microsoft account
-                </p>
-                <p>
-                    <CopyButton text={"Copy code"} content={data.flow.user_code} />
-                    {" "}<i className="fas fa-clock" />{" Code expires at " + new Date(data.flow.expires_at * 1000).toLocaleTimeString()}
-                </p>
-            </div>
-            }
+            {addingAccount && (
+                <div className={"row-fluid"}>
+                    <p style={{ marginTop: "10px" }}>
+                        Head to{" "}
+                        <a
+                            href={data.flow.verification_uri}
+                            target={"_blank"}
+                            rel={"noreferrer"}
+                        >
+                            {data.flow.verification_uri}
+                        </a>{" "}
+                        and enter code <code>{data.flow.user_code}</code> to
+                        connect your Microsoft account
+                    </p>
+                    <p>
+                        <CopyButton
+                            text={"Copy code"}
+                            content={data.flow.user_code}
+                        />{" "}
+                        <i className="fas fa-clock" />
+                        {" Code expires at " +
+                            new Date(
+                                data.flow.expires_at * 1000,
+                            ).toLocaleTimeString()}
+                    </p>
+                </div>
+            )}
 
-            {authStatus === "success" && <div className={"alert alert-success"} style={{marginTop: "5px"}}>
-                <p>
-                    <strong>Success! </strong>
-                    Your account has been successfully added to the plugin.
-                    Make sure to configure your sync folder below.
-                </p>
-            </div>}
-            {authStatus === "failed" && <div className={"alert alert-error"} style={{marginTop: "5px"}}>
-                <p>
-                    <strong>Error! </strong>
-                    There was an error adding your account.
-                    Please try again, or check the logs for details if this error persists.
-                </p>
-            </div>}
+            {authStatus === "success" && (
+                <div
+                    className={"alert alert-success"}
+                    style={{ marginTop: "5px" }}
+                >
+                    <p>
+                        <strong>Success! </strong>
+                        Your account has been successfully added to the plugin.
+                        Make sure to configure your sync folder below.
+                    </p>
+                </div>
+            )}
+            {authStatus === "failed" && (
+                <div
+                    className={"alert alert-error"}
+                    style={{ marginTop: "5px" }}
+                >
+                    <p>
+                        <strong>Error! </strong>
+                        There was an error adding your account. Please try
+                        again, or check the logs for details if this error
+                        persists.
+                    </p>
+                </div>
+            )}
         </>
     )
 }
