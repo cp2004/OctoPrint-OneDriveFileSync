@@ -5,6 +5,7 @@ from pathlib import Path
 
 import octo_onedrive.onedrive
 import octoprint.plugin
+from octoprint.util.version import is_octoprint_compatible
 
 from . import _version, sync, api
 
@@ -46,6 +47,12 @@ class OneDriveFilesSyncPlugin(
             else:
                 return False
 
+        def on_sync_start():
+            self.send_message("sync_start", {})
+
+        def on_sync_end():
+            self.send_message("sync_end", {})
+
         self.onedrive = octo_onedrive.onedrive.OneDriveComm(
             APPLICATION_ID,
             ["Files.ReadWrite"],
@@ -60,7 +67,8 @@ class OneDriveFilesSyncPlugin(
             onedrive=self.onedrive,
             octoprint_filemanager=self._file_manager,
             sync_condition=sync_condition,
-            on_log=lambda log, msg: None,
+            on_sync_start=on_sync_start,
+            on_sync_end=on_sync_end,
         )
         self.sync_worker.start()
 
@@ -106,7 +114,13 @@ class OneDriveFilesSyncPlugin(
 
     # AssetPlugin mixin
     def get_assets(self):
-        return {"js": ["dist/onedrive_backup.js", "viewmodels/settings.js", "viewmodels/navbar.js"]}
+        assets = {"js": ["dist/onedrive_backup.js", "viewmodels/settings.js", "viewmodels/navbar.js"]}
+
+        if is_octoprint_compatible("<=1.9.0"):
+            # Add icon transform CSS
+            assets["css"] = ["css/fa5-power-transform.min.css"]
+
+        return assets
 
     # Softwareupdate hook
     def get_update_information(self):

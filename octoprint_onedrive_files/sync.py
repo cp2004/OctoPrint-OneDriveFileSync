@@ -24,12 +24,12 @@ class OneDriveSyncWorker(threading.Thread):
         onedrive: octo_onedrive.onedrive.OneDriveComm,
         octoprint_filemanager: octoprint.filemanager.FileManager,
         sync_condition: callable,
-        on_log: callable,
+        on_sync_start: callable = lambda: None,
+        on_sync_end: callable = lambda: None,
     ):
         super().__init__()
 
         self._logger = logging.getLogger("octoprint.plugins.onedrive_files.sync")
-        self.on_log = on_log
 
         self.onedrive = onedrive
         self.octoprint_filemanager = octoprint_filemanager
@@ -49,15 +49,13 @@ class OneDriveSyncWorker(threading.Thread):
             self.config = lambda: config
 
         self.sync_condition = sync_condition
+        self.on_sync_start = on_sync_start
+        self.on_sync_end = on_sync_end
 
         self.interrupt = threading.Event()
         self.finished = False
 
         self.daemon = True
-
-    def dual_log(self, level, msg):
-        self._logger.log(level, msg)
-        self.on_log(level, msg)
 
     def stop(self):
         self.finished = True
@@ -75,17 +73,21 @@ class OneDriveSyncWorker(threading.Thread):
                 break
 
             if self.sync_condition():
-                run_sync(
-                    self.onedrive, self.octoprint_filemanager, config, self.dual_log
-                )
+                if callable(self.on_sync_start):
+                    self.on_sync_start()
+
+                run_sync(self.onedrive, self.octoprint_filemanager, config)
                 self.interrupt.clear()
+
+                if callable(self.on_sync_end):
+                    self.on_sync_end()
 
     def sync_now(self):
         # Override the interval and sync now
         self.interrupt.set()
 
 
-def run_sync(onedrive, octoprint_filemanager, config, log):
+def run_sync(onedrive, octoprint_filemanager, config):
     """Run a sync of the files to OneDrive"""
     logger.debug("Starting sync run, mode: %s", config["mode"])
     start_time = time.monotonic()
@@ -173,7 +175,7 @@ def run_sync(onedrive, octoprint_filemanager, config, log):
     }
 
     if mode not in sync_algorithms:
-        log(logging.ERROR, f"Invalid sync mode: {mode}")
+        logger.error(f"Invalid sync mode: {mode}")
         return
 
     sync_result = sync_algorithms[mode](octoprint_files, onedrive_files)
