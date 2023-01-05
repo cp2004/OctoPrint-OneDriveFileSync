@@ -1,4 +1,8 @@
-<a class="pull-right" href="javascript:void(0)">
+<a
+    class="pull-right"
+    href="javascript:void(0)"
+    data-bind="click: sync, popover: { placement: 'bottom', title: 'OneDrive Sync Status', content: syncPopoverContent, html: true, trigger: 'hover' }"
+>
     <span class="fa-layers fa-fw">
         <i class="fas fa-cloud" style="color:#0078D4"></i>
         <i data-bind="class: syncStatusClass" data-fa-transform="shrink-2 right-6 down-4"></i>
