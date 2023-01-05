@@ -32,10 +32,10 @@ class OneDriveFilesSyncPlugin(
         def get_config():
             return {
                 "mode": self._settings.get(["sync", "mode"]),
-                "interval": self._settings.get(["sync", "interval"]),
+                "interval": self._settings.get_int(["sync", "interval"]),
                 "onedrive_folder": self._settings.get(["folder", "id"]),
                 "octoprint_folder": "OneDrive",
-                "max_depth": self._settings.get(["sync", "max_depth"]),
+                "max_depth": self._settings.get_int(["sync", "max_depth"]),
             }
 
         def sync_condition():
