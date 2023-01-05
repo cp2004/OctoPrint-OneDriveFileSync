@@ -72,7 +72,8 @@ class OneDriveSyncWorker(threading.Thread):
             if self.finished:
                 break
 
-            if self.sync_condition():
+            if self.sync_condition() or self.interrupt.is_set():
+                # Either sync condition is met or we were asked to sync now
                 if callable(self.on_sync_start):
                     self.on_sync_start()
 
