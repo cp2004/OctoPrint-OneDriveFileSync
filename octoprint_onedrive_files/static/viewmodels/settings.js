@@ -11,7 +11,7 @@ $(function () {
             } else if (syncMode === "octoprint") {
                 return gettext("OctoPrint → OneDrive sync. The OneDrive folder will be synced to always be the same as the OctoPrint folder")
             } else if (syncMode === "two") {
-                return gettext("(Experimental) OneDrive ↔ OctoPrint sync.")
+                return gettext("(Experimental) OneDrive ↔ OctoPrint sync. OneDrive is preferred as the main source of files, but those added to OctoPrint will also be uploaded. Subject to change.")
             }
         })
     }
