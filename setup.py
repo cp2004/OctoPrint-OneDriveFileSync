@@ -35,7 +35,7 @@ plugin_license = "AGPLv3"
 
 # Any additional requirements besides OctoPrint should be listed here
 plugin_requires = [
-    "octo-onedrive"
+    "octo-onedrive==0.0.3"
     # My personal package that's used to do the onedrive communication, for common code between
     # the two plugins for Backup & File sync. See https://github.com/cp2004/Octo-OneDrive.
 ]
