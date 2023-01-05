@@ -239,7 +239,6 @@ def two_way_sync(octoprint_data, onedrive_data):
     # Take a copy of octoprint data so we can remove items as we go
     octoprint_files_remaining = copy.deepcopy(octoprint_data)
     for od_file_name, od_file_data in onedrive_data.items():
-
         if od_file_name not in octoprint_data:
             # Exists in OneDrive, not OctoPrint, so download
             actions.append({"action": "download", "file": od_file_name})
@@ -247,9 +246,11 @@ def two_way_sync(octoprint_data, onedrive_data):
             octoprint_files_remaining.pop(od_file_name)
             # Exists in both, check metadata
             op_file_data = octoprint_data[od_file_name]
-            if "eTag" in op_file_data and op_file_data["eTag"] != od_file_data["eTag"]:
-                # Metadata exists and is different, download (file modified in OneDrive)
-                actions.append({"action": "download", "file": od_file_name})
+            if "eTag" in op_file_data:
+                if op_file_data["eTag"] != od_file_data["eTag"]:
+                    # Metadata exists and is different, download (file modified in OneDrive)
+                    actions.append({"action": "download", "file": od_file_name})
+                # Otherwise, metadata matches and do nothing
             else:
                 # Metadata doesn't exist, upload (file overwritten in OP)
                 actions.append({"action": "upload", "file": od_file_name})
