@@ -77,7 +77,11 @@ class OneDriveSyncWorker(threading.Thread):
                 if callable(self.on_sync_start):
                     self.on_sync_start()
 
-                run_sync(self.onedrive, self.octoprint_filemanager, config)
+                try:
+                    run_sync(self.onedrive, self.octoprint_filemanager, config)
+                except FatalSyncError:
+                    logger.error("Fatal error during sync")
+
                 self.interrupt.clear()
 
                 if callable(self.on_sync_end):
@@ -106,6 +110,10 @@ def run_sync(onedrive, octoprint_filemanager, config):
     def recursive_list_onedrive_files(folder_id, current_depth=0, current_path="/"):
         result = {}
         root = onedrive.list_files_and_folders(folder_id)
+        if "error" in root:
+            # Error received from OneDrive, abort
+            raise FatalSyncError(root["error"])
+
         for item in root["items"]:
             # Check OneDrive file type is valid/supported by OP server
             if item["type"] == "file" and valid_file_type(item["name"]):
@@ -166,23 +174,17 @@ def run_sync(onedrive, octoprint_filemanager, config):
     except Exception as e:
         logger.error("Error while listing files")
         logger.exception(e)
-        return
+        raise FatalSyncError("Error while listing files")
 
     sync_algorithms = {
         "two": two_way_sync,
         "octoprint": octoprint_sync,
         "onedrive": onedrive_sync,
     }
-    actions = {
-        "upload": upload_onedrive,
-        "download": download_onedrive,
-        "delete_octoprint": delete_octoprint,
-        "delete_onedrive": delete_onedrive,
-    }
 
     if mode not in sync_algorithms:
         logger.error(f"Invalid sync mode: {mode}")
-        return
+        raise FatalSyncError
 
     sync_result = sync_algorithms[mode](octoprint_files, onedrive_files)
 
@@ -458,3 +460,8 @@ def delete_onedrive(
     if type(result) == dict and "error" in result:
         logger.error("Error deleting file from OneDrive, skipping (%s)", result["error"])
         return
+
+
+class FatalSyncError(Exception):
+    """Exception raised for fatal errors in the sync process."""
+    pass
