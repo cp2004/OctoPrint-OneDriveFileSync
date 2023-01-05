@@ -8,7 +8,7 @@ jobs:
     name: 🔨 Build distribution
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 0
       - name: 🏗 Set up Python 3.10
@@ -30,7 +30,6 @@ jobs:
         uses: EndBug/add-and-commit@v9
         with:
           push: false
-          branch: main
       - name: 🔨 Build a source zip
         run: |
           python setup.py sdist --formats=zip
