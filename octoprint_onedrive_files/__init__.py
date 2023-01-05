@@ -126,18 +126,18 @@ class OneDriveFilesSyncPlugin(
     def get_update_information(self):
         return {
             "onedrive_files": {
-                "displayName": "OneDrive Files",
+                "displayName": "OneDrive File Sync",
                 "displayVersion": self._plugin_version,
                 "type": "github_release",
                 "user": "cp2004",
-                "repo": "OctoPrint-OneDriveFiles",
+                "repo": "OctoPrint-OneDriveFileSync",
                 "current": self._plugin_version,
-                "pip": "https://github.com/cp2004/OctoPrint-OneDriveFiles/archive/{target_version}.zip",
+                "pip": "https://github.com/cp2004/OctoPrint-OneDriveFileSync/releases/download/{target_version}/release.zip",
             }
         }
 
 
-__plugin_name__ = "OneDrive Files Sync"
+__plugin_name__ = "OneDrive File Sync"
 __plugin_pythoncompat__ = ">=3,<4"
 __plugin_version__ = _version.get_versions()["version"]
 

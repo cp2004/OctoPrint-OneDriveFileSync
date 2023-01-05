@@ -12,7 +12,7 @@ plugin_package = "octoprint_onedrive_files"
 
 # The plugin's human readable name. Can be overwritten within OctoPrint's internal data via __plugin_name__ in the
 # plugin module
-plugin_name = "OctoPrint-OneDriveFilesSync"
+plugin_name = "OctoPrint-OneDriveFileSync"
 
 # The plugin's version. Can be overwritten within OctoPrint's internal data via __plugin_version__ in the plugin module
 plugin_version = versioneer.get_version()
@@ -28,7 +28,7 @@ plugin_author = "Charlie Powell"
 plugin_author_email = "cp2004.github@gmail.com"
 
 # The plugin's homepage URL. Can be overwritten within OctoPrint's internal data via __plugin_url__ in the plugin module
-plugin_url = "https://github.com/cp2004/OctoPrint-OneDriveFilesSync"
+plugin_url = "https://github.com/cp2004/OctoPrint-OneDriveFileSync"
 
 # The plugin's license. Can be overwritten within OctoPrint's internal data via __plugin_license__ in the plugin module
 plugin_license = "AGPLv3"
