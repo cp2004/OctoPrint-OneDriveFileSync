@@ -98,6 +98,11 @@ def run_sync(onedrive, octoprint_filemanager, config):
     onedrive_folder = config["onedrive_folder"]
     octoprint_folder = config["octoprint_folder"]
 
+    # Check we are properly configured before running sync
+    if not onedrive_folder or not len(onedrive.list_accounts()):
+        logger.debug("Plugin not fully configured, skipping sync")
+        return
+
     def recursive_list_onedrive_files(folder_id, current_depth=0, current_path="/"):
         result = {}
         root = onedrive.list_files_and_folders(folder_id)
