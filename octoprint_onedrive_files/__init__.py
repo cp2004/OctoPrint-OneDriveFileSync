@@ -55,7 +55,7 @@ class OneDriveFilesSyncPlugin(
             ["Files.ReadWrite"],
             str(Path(self._settings.get_plugin_data_folder()) / "token_cache.bin"),
             "https://login.microsoftonline.com/consumers",
-            # encryption_key=self._settings.global_get(["server", "secretKey"]),
+            encryption_key=self._settings.global_get(["server", "secretKey"]),
         )
 
         # Test starting the sync worker
@@ -151,6 +151,13 @@ class OneDriveFilesSyncPlugin(
             }
         }
 
+    def backup_excludes_hook(self, *args, **kwargs):
+        """
+        Excluding the MS Graph API token from the backup. Unnecessary security risk, if someone was to share
+        the backup it could partly compromise their MS account.
+        """
+        return ["token_cache.bin"]
+
 
 __plugin_name__ = "OneDrive File Sync"
 __plugin_pythoncompat__ = ">=3,<4"
@@ -163,5 +170,6 @@ def __plugin_load__():
 
     global __plugin_hooks__
     __plugin_hooks__ = {
-        "octoprint.plugin.softwareupdate.check_config": __plugin_implementation__.get_update_information
+        "octoprint.plugin.softwareupdate.check_config": __plugin_implementation__.get_update_information,
+        "octoprint.plugin.backup.additional_excludes": __plugin_implementation__.backup_excludes_hook,
     }
