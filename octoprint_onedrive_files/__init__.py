@@ -113,7 +113,7 @@ class OneDriveFilesSyncPlugin(
     def get_assets(self):
         assets = {
             "js": [
-                "dist/onedrive_backup.js",
+                "dist/onedrive_files.js",
                 "viewmodels/settings.js",
                 "viewmodels/navbar.js",
             ]

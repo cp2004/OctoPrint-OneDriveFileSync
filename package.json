@@ -5,7 +5,7 @@
     "scripts": {
         "start": "npm run esbuild-dev",
         "release": "esbuild ./octoprint_onedrive_files/static/src/onedrive.tsx --loader:.js=jsx --bundle --minify --sourcemap --target=\"chrome92,edge96,firefox94,ios12.2,safari13.1\" --outfile=./octoprint_onedrive_files/static/dist/onedrive_files.js",
-        "esbuild-dev": "esbuild ./octoprint_onedrive_files/static/src/onedrive.tsx --loader:.js=jsx --bundle --watch --target=\"chrome96,firefox95,safari15.2\" --outfile=./octoprint_onedrive_files/static/dist/onedrive_backup.js"
+        "esbuild-dev": "esbuild ./octoprint_onedrive_files/static/src/onedrive.tsx --loader:.js=jsx --bundle --watch --target=\"chrome96,firefox95,safari15.2\" --outfile=./octoprint_onedrive_files/static/dist/onedrive_files.js"
     },
     "repository": {
         "type": "git",
