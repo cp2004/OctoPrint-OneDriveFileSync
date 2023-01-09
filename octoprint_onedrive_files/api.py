@@ -84,5 +84,7 @@ class OneDriveFilesApi:
 
             self.plugin._settings.save()
 
+            self.plugin.send_message("folder_changed", {})
+
         if command == Commands.Forget:
             self.plugin.onedrive.forget_account()

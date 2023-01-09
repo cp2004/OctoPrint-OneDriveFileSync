@@ -1,3 +1,4 @@
+import time
 from pathlib import Path
 
 import octo_onedrive.onedrive
@@ -20,7 +21,10 @@ class OneDriveFilesSyncPlugin(
     onedrive: octo_onedrive.onedrive.OneDriveComm
     api: api.OneDriveFilesApi
 
+    last_sync: int
+
     def initialize(self):
+        self.last_sync = 0
         self.api = api.OneDriveFilesApi(self)
 
         # Create the 'OneDrive' folder if it doesn't exist
@@ -48,6 +52,7 @@ class OneDriveFilesSyncPlugin(
             self.send_message("sync_start", {})
 
         def on_sync_end():
+            self.last_sync = int(time.time())
             self.send_message("sync_end", {})
 
         self.onedrive = octo_onedrive.onedrive.OneDriveComm(
@@ -88,6 +93,17 @@ class OneDriveFilesSyncPlugin(
                 "while_printing": False,
             },
         }
+
+    def on_settings_load(self):
+        data = octoprint.plugin.SettingsPlugin.on_settings_load(self)
+        # Inject the list of accounts in to the settings
+        accounts = self.onedrive.list_accounts()
+        data["accounts"] = accounts
+
+        # Inject last sync as well, to save an extra network request
+        data["last_sync"] = self.last_sync
+
+        return data
 
     def get_api_commands(self):
         return api.Commands.list_commands()
