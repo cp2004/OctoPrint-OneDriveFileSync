@@ -99,20 +99,26 @@ export default function FileBrowser() {
     return (
         <>
             <h5>Sync Folder</h5>
-            {configDataFetching ? (
-                <span>
-                    <i className={"fas fa-spin fa-spinner"} /> Loading...
-                </span>
-            ) : (
-                <span>
-                    Currently configured sync folder:{" "}
-                    {configData?.folder.path ? (
-                        <code>{configData.folder.path}</code>
-                    ) : (
-                        "None"
-                    )}
-                </span>
-            )}
+            <p>
+                {configDataFetching ? (
+                    <span>
+                        <i className={"fas fa-spin fa-spinner"} /> Loading...
+                    </span>
+                ) : (
+                    <span>
+                        Currently configured sync folder:{" "}
+                        {configData?.folder.path ? (
+                            <code>{configData.folder.path}</code>
+                        ) : (
+                            "None"
+                        )}
+                    </span>
+                )}
+            </p>
+            <p>
+                Files will be synced between this folder in OneDrive and the
+                'OneDrive' folder in OctoPrint.
+            </p>
             <div className={"row-fluid"}>
                 {configData?.folder.path && (
                     <button
