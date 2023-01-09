@@ -74,7 +74,7 @@ class OneDriveFilesSyncPlugin(
         return {
             "folder": {
                 "id": "",
-                "name": "",
+                "path": "",
             },
             # Sync modes:
             # OctoPrint => OneDrive (octoprint)
