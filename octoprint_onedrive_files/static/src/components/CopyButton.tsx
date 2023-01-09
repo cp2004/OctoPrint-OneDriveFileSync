@@ -1,17 +1,16 @@
 import * as React from "react"
+import copy from "copy-to-clipboard"
 
 export default function CopyButton({ text, content }) {
     const [copied, setCopied] = React.useState(false)
     const [copyError, setCopyError] = React.useState(false)
 
-    const copy = async (text) => {
+    const performCopy = async (text) => {
         setCopyError(false)
         if (!navigator?.clipboard) {
-            console.warn("Clipboard not supported")
-            return false
+            return copy(text)
         }
 
-        // Try to save to clipboard then save it in the state if worked
         try {
             await navigator.clipboard.writeText(text)
             return true
@@ -22,7 +21,7 @@ export default function CopyButton({ text, content }) {
     }
 
     const doCopy = () => {
-        copy(content).then((result) => {
+        performCopy(content).then((result) => {
             if (result) {
                 setCopied(true)
                 setTimeout(() => setCopied(false), 5000)
